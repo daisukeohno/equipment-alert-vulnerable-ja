@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>jp.daisukeohno</groupId>
+  <artifactId>equipment-alert-vulnerable-ja</artifactId>
+  <version>1.0.0</version>
+  <packaging>war</packaging>
+
+  <name>設備アラートバッチ(脆弱性デモ)</name>
+  <description>
+    セキュリティスキャン検証用に意図的に脆弱性を埋め込んだ、製造業向け設備アラートバッチの
+    レガシーJavaアプリケーションサンプル。本番利用禁止。
+  </description>
+
+  <properties>
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>8</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <!-- 意図的に古いバージョン: 既知のCVEあり (CVE-2021-44228系の前身であるlog4j1系の脆弱性含む) -->
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.17</version>
+    </dependency>
+
+    <!-- 意図的に古いバージョン: CVE-2015-7501 (安全でないデシリアライズ) の対象バージョン -->
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+
+    <!-- レガシーStruts 1.x相当のサーブレット/JDBCスタイルを再現するための最低限の依存 -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>3.1.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.6</version>
+    </dependency>
+  </dependencies>
+</project>
