@@ -40,8 +40,8 @@ pom.xml                              // 既知脆弱性を含む古い依存バ�
 | パストラバーサル (CWE-22) | `AlertFileDownloadServlet.java` | ファイル名パラメータの検証なし |
 | XXE (CWE-611) | `AlertXmlImportService.java` | 外部エンティティ解決を無効化していないXMLパーサ |
 | OSコマンドインジェクション (CWE-78) | `MaintenanceCommandExecutor.java` | `Runtime.exec`にユーザー入力をそのまま渡す |
-| 安全でないデシリアライズ (CWE-502) | `AlertReportSerializer.java` | `ObjectInputStream`で検証なしに復元 |
-| 既知脆弱性のある依存関係 | `pom.xml` | log4j 1.2.17 / commons-collections 3.2.1 など |
+| 安全でないデシリアライズ (CWE-502) | `AlertReportSerializer.java` | ~~`ObjectInputStream`で検証なしに復元~~ 対策済み: 許可リスト方式の`ObjectInputStream`で復元クラスを制限 |
+| 既知脆弱性のある依存関係 | `pom.xml` | log4j 1.2.17 は残存 / commons-collections は 3.2.2 に更新 |
 | 機密情報のログ出力 (CWE-532) | `EquipmentAlertDao.java` | パスワードを平文でログ出力 |
 
 ## ビルド
