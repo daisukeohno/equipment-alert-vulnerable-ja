@@ -1,6 +1,7 @@
 package jp.daisukeohno.equipmentalert.dao;
 
 import jp.daisukeohno.equipmentalert.model.EquipmentAlert;
+import jp.daisukeohno.equipmentalert.util.PasswordUtil;
 import org.apache.log4j.Logger;
 
 import java.sql.*;
@@ -18,6 +19,7 @@ import java.util.List;
 public class EquipmentAlertDao {
 
     private static final Logger logger = Logger.getLogger(EquipmentAlertDao.class);
+    private static final String DUMMY_HASH = PasswordUtil.hashSecure("dummy-password");
 
     // ★脆弱性: DB接続情報をソースコードに直書きしている(本来は環境変数や
     //   シークレット管理サービス経由で取得すべき)
@@ -65,22 +67,28 @@ public class EquipmentAlertDao {
 
     /**
      * ログイン認証処理。
-     *
-     * ★脆弱性: ユーザー名・パスワードをそのままSQL文に埋め込んでおり、
-     *   典型的な「認証バイパス型SQLインジェクション」が成立する。
+     * ユーザー名をプレースホルダで検索し、PBKDF2ハッシュでパスワードを照合する。
+     * operator_account に password_hash 列を追加し、PasswordUtil.hashSecure で
+     * 作成した値を格納してください。既存の平文 password 列は移行が必要です。
      */
     public boolean authenticate(String username, String password) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM operator_account WHERE username = '"
-                + username + "' AND password = '" + password + "'";
+        if (username == null || password == null) {
+            return false;
+        }
+
+        String sql = "SELECT password_hash FROM operator_account WHERE username = ?";
 
         try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return PasswordUtil.verifySecure(password, rs.getString(1));
+                }
             }
         }
+
+        PasswordUtil.verifySecure(password, DUMMY_HASH);
         return false;
     }
 }
